@@ -12,6 +12,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="mapfile2.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="mapfile.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

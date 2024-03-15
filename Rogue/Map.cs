@@ -41,6 +41,8 @@ namespace Rogue
                         case 2:
                             Console.Write("#"); // Wall
                             break;
+                        case 3: Console.Write(">");
+                            break;
                         default:
                             Console.Write(" ");
                             break;

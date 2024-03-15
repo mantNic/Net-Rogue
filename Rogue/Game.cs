@@ -52,7 +52,8 @@ namespace Rogue
           
             MapReader reader = new MapReader();
             Map level1 = reader.LoadMapFromFile("mapfile.json");
-            
+            Map level2 = reader.LoadMapFromFile("mapfile2.json");
+            Map currentlevel = level1;
             while (true)
             {
                 Console.WriteLine("Select Race");
@@ -116,7 +117,7 @@ namespace Rogue
 
             Console.Clear();
             player.paikka = new Vector2(1, 1);
-            level1.draw();
+            currentlevel.draw();
             Console.SetCursorPosition((int)player.paikka.X, (int)player.paikka.Y);
             Console.Write("@");
 
@@ -149,14 +150,21 @@ namespace Rogue
                 // TODO: CHECK COLLISION WITH WALLS
                 int newX = (int)player.paikka.X + moveX;
                 int newY = (int)player.paikka.Y + moveY;
-                int tile = level1.getTile(newX, newY);
+                int tile = currentlevel.getTile(newX, newY);
                 if (tile == 1)
                 {
                     player.paikka.X += moveX;
                     player.paikka.Y += moveY;
                 }
+                if (tile == 3)
+                {
+                    Console.Clear();
+                    player.paikka = new Vector2(1, 1);
+                    currentlevel = level2;
+                    Console.SetCursorPosition((int)player.paikka.X, (int)player.paikka.Y);
+                    Console.Write("@");
+                }
                 
-
              
                
                 
@@ -182,7 +190,7 @@ namespace Rogue
                 // Clear the screen so that player appears only in one place
                 Console.Clear();
                 // Draw the player
-                level1.draw();
+                currentlevel.draw();
                 Console.SetCursorPosition((int)player.paikka.X, (int)player.paikka.Y);
                 Console.Write("@");
             } // game loop ends
