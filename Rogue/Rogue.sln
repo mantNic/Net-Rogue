@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34221.43
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rogue", "Rogue.csproj", "{5261948F-C06D-4817-A9DB-4841D9CE4E8D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rogue", "Rogue.csproj", "{5261948F-C06D-4817-A9DB-4841D9CE4E8D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RayGuiCreator", "..\..\github\RayGuiCreator\RayGuiCreator\RayGuiCreator.csproj", "{827D7073-5A54-4833-AA1F-C8075A7F1884}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TurboMapReader", "..\..\github\TurboMapReader\TurboMapReader.csproj", "{D0058FAA-64D8-4A5D-B619-8F5414EA4A24}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{5261948F-C06D-4817-A9DB-4841D9CE4E8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5261948F-C06D-4817-A9DB-4841D9CE4E8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5261948F-C06D-4817-A9DB-4841D9CE4E8D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{827D7073-5A54-4833-AA1F-C8075A7F1884}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{827D7073-5A54-4833-AA1F-C8075A7F1884}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{827D7073-5A54-4833-AA1F-C8075A7F1884}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{827D7073-5A54-4833-AA1F-C8075A7F1884}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0058FAA-64D8-4A5D-B619-8F5414EA4A24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0058FAA-64D8-4A5D-B619-8F5414EA4A24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0058FAA-64D8-4A5D-B619-8F5414EA4A24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0058FAA-64D8-4A5D-B619-8F5414EA4A24}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
