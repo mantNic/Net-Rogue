@@ -160,7 +160,12 @@ namespace Rogue
         {
             int index = x + y * mapWidth;
             int tileId = GetLayer("ground").mapTiles[index];
-            return tileId;
+            if (Game.WallTileNumbers.Contains(tileId))
+            {
+                // Is a wall
+                return 2;
+            }
+            return 1;
         }
 
         private void Drawtile(int tileIndex, int pixelX, int pixelY)
@@ -195,7 +200,10 @@ namespace Rogue
                     int pixelY = (int)(y * Game.tileSize);
                     // Draw the tile graphics
                     Console.SetCursorPosition(x, y);
-
+                    if(tileIndex > 0)
+                    {
+                        tileIndex--;
+                    }
                     Drawtile(tileIndex, pixelX, pixelY);
 
                 }

@@ -13,6 +13,7 @@ namespace Rogue
         Map level2;
         Map currentlevel;
         public static readonly int tileSize = 16;
+        public static readonly List<int> WallTileNumbers = new List<int>{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 12, 13, 14, 15, 16, 17, 18, 19, 20, 24, 25, 26, 27, 28, 29, 40, 57, 58, 59 }; 
         enum GameState
         {
             MainMenu,
@@ -259,13 +260,13 @@ namespace Rogue
            
             player = CreateCharacter();
 
-            player.paikka = new Vector2(1, 1);
+            player.paikka = new Vector2(3, 3);
 
             MapReader reader = new MapReader();
             level1 = reader.LoadMapFromFile("mapfile_layers.json");
             level2 = reader.LoadMapFromFile("mapfile_layers.json");
             Map tiledMap = reader.LoadTiled();
-            currentlevel = level1;
+            currentlevel = tiledMap;
 
             Raylib.InitWindow(480, 270, "rogue");
             Raylib.SetTargetFPS(30);
@@ -274,12 +275,15 @@ namespace Rogue
             player.spritesheet = imageTexture;
             level1.SetSpriteSheet(imageTexture, 12);
             level2.SetSpriteSheet(imageTexture, 12);
+            tiledMap.SetSpriteSheet(imageTexture, 12);
 
             level1.LoadEnemies();
             level2.LoadEnemies();
+            tiledMap.LoadEnemies();
 
             level1.LoadItems();
             level2.LoadItems();
+            tiledMap.LoadItems();
         }
 
         private void DrawGame()
