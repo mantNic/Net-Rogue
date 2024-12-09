@@ -4,23 +4,26 @@ using ZeroElectric.Vinculum;
 
 namespace Rogue
 {
+    public enum GameState
+    {
+        MainMenu,
+        CharacterCreation,
+        GameLoop,
+        OptionsMenu,
+        PauseMenu
+    }
     public class Game
     {
-        PauseMenu myPauseMenu;
-        OptionsMenu myOptionsMenu;
+        PauseMenu myPauseMenu = new PauseMenu();
+        OptionsMenu myOptionsMenu = new OptionsMenu();
         PlayerCharacter player;
         Map level1;
         Map level2;
         Map currentlevel;
         public static readonly int tileSize = 16;
-        public static readonly List<int> WallTileNumbers = new List<int>{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 12, 13, 14, 15, 16, 17, 18, 19, 20, 24, 25, 26, 27, 28, 29, 40, 57, 58, 59 }; 
-        enum GameState
-        {
-            MainMenu,
-            CharacterCreation,
-            GameLoop
-        }
-        GameState currentGameState;
+        public static readonly List<int> WallTileNumbers = new List<int> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 12, 13, 14, 15, 16, 17, 18, 19, 20, 24, 25, 26, 27, 28, 29, 40, 57, 58, 59 };
+
+        public static GameState currentGameState;
         TextBoxEntry playerNameEntry;
         MultipleChoiceEntry classChoiceEntry;
 
@@ -75,17 +78,22 @@ namespace Rogue
             int menuX = Raylib.GetScreenWidth() / 2 - menuWidth / 2;
             int menuY = 10;
             int rowHeight = Raylib.GetScreenHeight() / 10;
-            RayGuiCreator.MenuCreator creator = new RayGuiCreator.MenuCreator(menuX, menuY, rowHeight, menuWidth);
+            MenuCreator creator = new MenuCreator(menuX, menuY, rowHeight, menuWidth);
 
             creator.Label("Main Menu");
             if (creator.Button("Start Game"))
             {
                 currentGameState = GameState.CharacterCreation;
             }
+            creator.Label("Options Menu");
+            if (creator.Button("Options"))
+            {
+                currentGameState = GameState.OptionsMenu;
+            }
         }
 
-        
-    
+
+
 
         public bool TestName(string nimi)
         {
@@ -145,7 +153,7 @@ namespace Rogue
             }
         }
 
-       
+
 
         private PlayerCharacter CreateCharacter()
         {
@@ -257,7 +265,7 @@ namespace Rogue
             myOptionsMenu = new OptionsMenu();
             playerNameEntry = new TextBoxEntry(12);
             classChoiceEntry = new MultipleChoiceEntry(new string[] { "Rogue", "Warrior", "Magician" });
-           
+
             player = CreateCharacter();
 
             player.paikka = new Vector2(3, 3);
@@ -334,8 +342,8 @@ namespace Rogue
                 player.paikka.X += moveX;
                 player.paikka.Y += moveY;
 
-               Enemy E = currentlevel.GetEnemyAt(newX, newY);
-                if(E != null)
+                Enemy E = currentlevel.GetEnemyAt(newX, newY);
+                if (E != null)
                 {
                     Console.WriteLine("You found an enemy");
                 }
@@ -381,6 +389,11 @@ namespace Rogue
         {
             while (Raylib.WindowShouldClose() == false)
             {
+                // Kuuntele näppäimiä kuuluuko mennä pause menuun
+                if (Raylib.IsKeyPressed(KeyboardKey.KEY_P))
+                {
+                    currentGameState = GameState.PauseMenu;
+                }
                 switch (currentGameState)
                 {
                     case GameState.MainMenu:
@@ -397,6 +410,18 @@ namespace Rogue
                     case GameState.GameLoop:
                         DrawGame();
                         UpdateGame();
+                        break;
+                    case GameState.OptionsMenu:
+                        Raylib.BeginDrawing();
+                        Raylib.ClearBackground(Raylib.BLACK);
+                        myOptionsMenu.DrawMenu();
+                        Raylib.EndDrawing();
+                        break;
+                    case GameState.PauseMenu:
+                        Raylib.BeginDrawing();
+                        Raylib.ClearBackground(Raylib.BLACK);
+                        myOptionsMenu.DrawMenu();
+                        Raylib.EndDrawing();
                         break;
 
 
