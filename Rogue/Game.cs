@@ -23,9 +23,13 @@ namespace Rogue
         public static readonly int tileSize = 16;
         public static readonly List<int> WallTileNumbers = new List<int> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 12, 13, 14, 15, 16, 17, 18, 19, 20, 24, 25, 26, 27, 28, 29, 40, 57, 58, 59 };
 
-        public static GameState currentGameState;
+
+        Stack<GameState> stateStack = new Stack<GameState>();
+
         TextBoxEntry playerNameEntry;
         MultipleChoiceEntry classChoiceEntry;
+        MultipleChoiceEntry raceChoiceEntry;
+        
 
         void DrawCharaterCreationMenu()
         {
@@ -33,11 +37,12 @@ namespace Rogue
             int menuX = Raylib.GetScreenWidth() / 2 - menuWidth / 2;
             int menuY = 10;
             int rowHeight = Raylib.GetScreenHeight() / 10;
-            RayGuiCreator.MenuCreator creator = new RayGuiCreator.MenuCreator(menuX, menuY, rowHeight, menuWidth);
+            MenuCreator creator = new MenuCreator(menuX, menuY, rowHeight, menuWidth);
 
             creator.Label("Charater name");
             creator.TextBox(playerNameEntry);
             creator.DropDown(classChoiceEntry);
+            creator.DropDown(raceChoiceEntry);
 
             if (creator.Button("Start Game"))
             {
@@ -45,7 +50,7 @@ namespace Rogue
                 {
                     player.name = playerNameEntry.ToString();
 
-                    currentGameState = GameState.GameLoop;
+                    stateStack.Push(GameState.GameLoop); 
 
                     string luokkaVastaus = classChoiceEntry.ToString();
 
@@ -68,6 +73,28 @@ namespace Rogue
                     {
                         Console.WriteLine("Ei kelpaa");
                     }
+
+                    string rotuVastaus = raceChoiceEntry.ToString();
+                    if (rotuVastaus == Race.Human.ToString() || rotuVastaus == "1")
+                    {
+                        player.rotu = Race.Human;
+
+                    }
+                    else if (rotuVastaus == Race.Elf.ToString() || rotuVastaus == "2")
+                    {
+                        player.rotu = Race.Elf;
+
+                    }
+                    else if (rotuVastaus == Race.Orc.ToString() || rotuVastaus == "3")
+                    {
+                        player.rotu = Race.Orc;
+
+                    }
+                    else
+                    {
+                        Console.WriteLine("Ei kelpaa");
+                    }
+
                 }
             }
             creator.EndMenu();
@@ -83,12 +110,12 @@ namespace Rogue
             creator.Label("Main Menu");
             if (creator.Button("Start Game"))
             {
-                currentGameState = GameState.CharacterCreation;
+                stateStack.Push(GameState.CharacterCreation);  
             }
             creator.Label("Options Menu");
             if (creator.Button("Options"))
             {
-                currentGameState = GameState.OptionsMenu;
+                stateStack.Push(GameState.OptionsMenu); 
             }
         }
 
@@ -117,49 +144,11 @@ namespace Rogue
             }
             return nameOk;
         }
-
-
-
-
-        private Race askRace()
-        {
-            while (true)
-            {
-                Console.WriteLine("Select Race");
-                Console.WriteLine("1 tai " + Race.Human.ToString());
-                Console.WriteLine("2 tai " + Race.Elf.ToString());
-                Console.WriteLine("3 tai " + Race.Orc.ToString());
-                string rotuVastaus = Console.ReadLine();
-
-                if (rotuVastaus == Race.Human.ToString() || rotuVastaus == "1")
-                {
-                    return Race.Human;
-
-                }
-                else if (rotuVastaus == Race.Elf.ToString() || rotuVastaus == "2")
-                {
-                    return Race.Elf;
-
-                }
-                else if (rotuVastaus == Race.Orc.ToString() || rotuVastaus == "3")
-                {
-                    return Race.Orc;
-
-                }
-                else
-                {
-                    Console.WriteLine("Ei kelpaa");
-                }
-            }
-        }
-
-
-
         private PlayerCharacter CreateCharacter()
         {
             PlayerCharacter player = new PlayerCharacter();
 
-            player.rotu = askRace();
+           
             return player;
         }
 
@@ -171,100 +160,32 @@ namespace Rogue
             GameLoop();
 
 
+        }
+        public void onOptionsBackPressed(object sender, EventArgs e)
+        {
+            stateStack.Pop();
+        }
 
-
-
-
-
-
-            /* Console.Clear();
-             player.paikka = new Vector2(1, 1);
-             currentlevel.draw();
-             Console.SetCursorPosition((int)player.paikka.X, (int)player.paikka.Y);
-             Console.Write("@");
-
-             while (true)
-             {
-                 // ------------Update:
-                 // Prepare to read movement input
-                 int moveX = 0;
-                 int moveY = 0;
-                 // Wait for keypress and compare value to ConsoleKey enum
-                 ConsoleKeyInfo key = Console.ReadKey();
-                 if (key.Key == ConsoleKey.UpArrow)
-                 {
-                     moveY = -1;
-                 }
-                 else if (key.Key == ConsoleKey.DownArrow)
-                 {
-                     moveY = 1;
-                 }
-                 else if (key.Key == ConsoleKey.LeftArrow)
-                 {
-                     moveX = -1;
-                 }
-                 else if (key.Key == ConsoleKey.RightArrow)
-                 {
-                     moveX = 1;
-                 }
-
-                 //
-                 // TODO: CHECK COLLISION WITH WALLS
-                 int newX = (int)player.paikka.X + moveX;
-                 int newY = (int)player.paikka.Y + moveY;
-                 int tile = currentlevel.getTile(newX, newY);
-                 if (tile == 1)
-                 {
-                     player.paikka.X += moveX;
-                     player.paikka.Y += moveY;
-                 }
-                 if (tile == 3)
-                 {
-                     Console.Clear();
-                     player.paikka = new Vector2(1, 1);
-                     currentlevel = level2;
-                     Console.SetCursorPosition((int)player.paikka.X, (int)player.paikka.Y);
-                     Console.Write("@");
-                 }
-
-
-
-
-                 // Prevent player from going outside screen
-                 if (player.paikka.X < 0)
-                 {
-                     player.paikka.X = 0;
-                 }
-                 else if (player.paikka.X > Console.WindowWidth - 1)
-                 {
-                     player.paikka.X = Console.WindowWidth - 1;
-                 }
-                 if (player.paikka.Y < 0)
-                 {
-                     player.paikka.Y = 0;
-                 }
-                 else if (player.paikka.Y > Console.WindowHeight - 1)
-                 {
-                     player.paikka.Y = Console.WindowHeight - 1;
-                 }
-
-                 // -----------Draw:
-                 // Clear the screen so that player appears only in one place
-                 Console.Clear();
-                 // Draw the player
-                 currentlevel.draw();
-                 Console.SetCursorPosition((int)player.paikka.X, (int)player.paikka.Y);
-                 Console.Write("@");
-             } // game loop ends
-            */
-
+        public void onPauseBackPressed(object sender, EventArgs e)
+        {
+            stateStack.Pop();
+        }
+        
+        public void onOptionsPressed(object sender, EventArgs e)
+        {
+            stateStack.Push(GameState.OptionsMenu);
         }
         private void Init()
         {
-            currentGameState = GameState.MainMenu;
+            stateStack.Push(GameState.MainMenu);
+            myPauseMenu = new PauseMenu();
+            myPauseMenu.OptionsPressed += onOptionsPressed;
+            myPauseMenu.BackButtonPressedEvent += onPauseBackPressed;
             myOptionsMenu = new OptionsMenu();
+            myOptionsMenu.BackButtonPressedEvent += onOptionsBackPressed;
             playerNameEntry = new TextBoxEntry(12);
             classChoiceEntry = new MultipleChoiceEntry(new string[] { "Rogue", "Warrior", "Magician" });
+            raceChoiceEntry = new MultipleChoiceEntry(new string[] { "Human", "Elf", "Orc" });
 
             player = CreateCharacter();
 
@@ -361,11 +282,6 @@ namespace Rogue
                 Console.SetCursorPosition((int)player.paikka.X, (int)player.paikka.Y);
                 Console.Write("@");
             }
-
-
-
-
-
             if (player.paikka.X < 0)
             {
                 player.paikka.X = 0;
@@ -392,12 +308,13 @@ namespace Rogue
                 // Kuuntele näppäimiä kuuluuko mennä pause menuun
                 if (Raylib.IsKeyPressed(KeyboardKey.KEY_P))
                 {
-                    currentGameState = GameState.PauseMenu;
+                    stateStack.Push(GameState.PauseMenu);
                 }
-                switch (currentGameState)
+                switch (stateStack.Peek())
                 {
                     case GameState.MainMenu:
                         Raylib.BeginDrawing();
+                        Raylib.ClearBackground(Raylib.BLACK);
                         DrawMainMenu();
                         Raylib.EndDrawing();
                         break;
@@ -420,7 +337,7 @@ namespace Rogue
                     case GameState.PauseMenu:
                         Raylib.BeginDrawing();
                         Raylib.ClearBackground(Raylib.BLACK);
-                        myOptionsMenu.DrawMenu();
+                        myPauseMenu.DrawMenu();
                         Raylib.EndDrawing();
                         break;
 

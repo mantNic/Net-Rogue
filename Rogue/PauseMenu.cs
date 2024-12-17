@@ -11,7 +11,8 @@ namespace Rogue
     class PauseMenu
     {
         public event EventHandler BackButtonPressedEvent;
-      public void DrawMenu()
+        public event EventHandler OptionsPressed;
+        public void DrawMenu()
         {
             int menuWidth = 200;
             int menuX = Raylib.GetScreenWidth() / 2 - menuWidth / 2;
@@ -19,10 +20,16 @@ namespace Rogue
             int rowHeight = Raylib.GetScreenHeight() / 10;
             MenuCreator creator = new MenuCreator(menuX, menuY, rowHeight, menuWidth);
 
+            
+
             creator.Label("Pause Menu");
+            if(creator.Button("Options"))
+            {
+                OptionsPressed.Invoke(this, new EventArgs());
+            }
             if (creator.Button("Back"))
             {
-
+                BackButtonPressedEvent.Invoke(this, EventArgs.Empty);
             }
         }
      
