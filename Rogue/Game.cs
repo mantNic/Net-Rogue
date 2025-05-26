@@ -23,14 +23,15 @@ namespace Rogue
         public static readonly int tileSize = 16;
         public static readonly List<int> WallTileNumbers = new List<int> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 12, 13, 14, 15, 16, 17, 18, 19, 20, 24, 25, 26, 27, 28, 29, 40, 57, 58, 59 };
 
-
         Stack<GameState> stateStack = new Stack<GameState>();
 
         TextBoxEntry playerNameEntry;
         MultipleChoiceEntry classChoiceEntry;
         MultipleChoiceEntry raceChoiceEntry;
-        
 
+        /// <summary>
+        /// Piirtää hahmonluontivalikon ja käsittelee käyttäjän syötteen hahmon luomiseksi.
+        /// </summary>
         void DrawCharaterCreationMenu()
         {
             int menuWidth = 200;
@@ -50,24 +51,21 @@ namespace Rogue
                 {
                     player.name = playerNameEntry.ToString();
 
-                    stateStack.Push(GameState.GameLoop); 
+                    stateStack.Push(GameState.GameLoop);
 
                     string luokkaVastaus = classChoiceEntry.ToString();
 
                     if (luokkaVastaus == Class.Rogue.ToString() || luokkaVastaus == "1")
                     {
                         player.luokka = Class.Rogue;
-
                     }
                     else if (luokkaVastaus == Class.Warrior.ToString() || luokkaVastaus == "2")
                     {
                         player.luokka = Class.Warrior;
-
                     }
                     else if (luokkaVastaus == Class.Magician.ToString() || luokkaVastaus == "3")
                     {
                         player.luokka = Class.Magician;
-
                     }
                     else
                     {
@@ -78,27 +76,27 @@ namespace Rogue
                     if (rotuVastaus == Race.Human.ToString() || rotuVastaus == "1")
                     {
                         player.rotu = Race.Human;
-
                     }
                     else if (rotuVastaus == Race.Elf.ToString() || rotuVastaus == "2")
                     {
                         player.rotu = Race.Elf;
-
                     }
                     else if (rotuVastaus == Race.Orc.ToString() || rotuVastaus == "3")
                     {
                         player.rotu = Race.Orc;
-
                     }
                     else
                     {
                         Console.WriteLine("Ei kelpaa");
                     }
-
                 }
             }
             creator.EndMenu();
         }
+
+        /// <summary>
+        /// Piirtää päävalikon ja käsittelee käyttäjän syötteen siirtyäkseen muihin valikoihin.
+        /// </summary>
         public void DrawMainMenu()
         {
             int menuWidth = 200;
@@ -110,18 +108,20 @@ namespace Rogue
             creator.Label("Main Menu");
             if (creator.Button("Start Game"))
             {
-                stateStack.Push(GameState.CharacterCreation);  
+                stateStack.Push(GameState.CharacterCreation);
             }
             creator.Label("Options Menu");
             if (creator.Button("Options"))
             {
-                stateStack.Push(GameState.OptionsMenu); 
+                stateStack.Push(GameState.OptionsMenu);
             }
         }
 
-
-
-
+        /// <summary>
+        /// Tarkistaa pelaajan nimen varmistaen, että se ei ole tyhjä ja sisältää vain kirjaimia.
+        /// </summary>
+        /// <param name="nimi">Tarkistettava nimi.</param>
+        /// <returns>True jos kelpaa, muuten false.</returns>
         public bool TestName(string nimi)
         {
             if (string.IsNullOrEmpty(nimi))
@@ -133,34 +133,33 @@ namespace Rogue
             for (int i = 0; i < nimi.Length; i++)
             {
                 char kirjain = nimi[i];
-                if (Char.IsLetter(kirjain) == false)
+                if (!Char.IsLetter(kirjain))
                 {
                     nameOk = false;
                     Console.WriteLine("Nimessä täytyy olla vain kirjaimia");
                     break;
                 }
-
-
             }
             return nameOk;
         }
+
+        /// <summary>
+        /// Luo uuden pelaajahahmon.
+        /// </summary>
+        /// <returns>Uusi PlayerCharacter-olio.</returns>
         private PlayerCharacter CreateCharacter()
         {
             PlayerCharacter player = new PlayerCharacter();
-
-           
             return player;
         }
 
         public void Run()
         {
-
             Console.Clear();
             Init();
             GameLoop();
-
-
         }
+
         public void onOptionsBackPressed(object sender, EventArgs e)
         {
             stateStack.Pop();
@@ -170,11 +169,15 @@ namespace Rogue
         {
             stateStack.Pop();
         }
-        
+
         public void onOptionsPressed(object sender, EventArgs e)
         {
             stateStack.Push(GameState.OptionsMenu);
         }
+
+        /// <summary>
+        /// Alustaa pelin muuttujat, valikot, pelaajan, kentät ja grafiikat.
+        /// </summary>
         private void Init()
         {
             stateStack.Push(GameState.MainMenu);
@@ -188,7 +191,6 @@ namespace Rogue
             raceChoiceEntry = new MultipleChoiceEntry(new string[] { "Human", "Elf", "Orc" });
 
             player = CreateCharacter();
-
             player.paikka = new Vector2(3, 3);
 
             MapReader reader = new MapReader();
@@ -215,45 +217,30 @@ namespace Rogue
             tiledMap.LoadItems();
         }
 
+        /// <summary>
+        /// Piirtää nykyisen pelitason ja pelaajahahmon.
+        /// </summary>
         private void DrawGame()
         {
             Raylib.BeginDrawing();
             Raylib.ClearBackground(Raylib.BLACK);
             currentlevel.draw();
             player.draw();
-
-
-
-
             Raylib.EndDrawing();
         }
 
+        /// <summary>
+        /// Päivittää pelitilanteen käsitellen pelaajan liikkeen ja vuorovaikutukset.
+        /// </summary>
         private void UpdateGame()
         {
-
-
-
-            // switch(key) ends
             int moveX = 0;
             int moveY = 0;
-            // Wait for keypress and compare value to ConsoleKey enum
 
-            if (Raylib.IsKeyPressed(KeyboardKey.KEY_UP))
-            {
-                moveY = -1;
-            }
-            else if (Raylib.IsKeyPressed(KeyboardKey.KEY_DOWN))
-            {
-                moveY = 1;
-            }
-            else if (Raylib.IsKeyPressed(KeyboardKey.KEY_LEFT))
-            {
-                moveX = -1;
-            }
-            else if (Raylib.IsKeyPressed(KeyboardKey.KEY_RIGHT))
-            {
-                moveX = 1;
-            }
+            if (Raylib.IsKeyPressed(KeyboardKey.KEY_UP)) moveY = -1;
+            else if (Raylib.IsKeyPressed(KeyboardKey.KEY_DOWN)) moveY = 1;
+            else if (Raylib.IsKeyPressed(KeyboardKey.KEY_LEFT)) moveX = -1;
+            else if (Raylib.IsKeyPressed(KeyboardKey.KEY_RIGHT)) moveX = 1;
 
             int newX = (int)player.paikka.X + moveX;
             int newY = (int)player.paikka.Y + moveY;
@@ -282,30 +269,21 @@ namespace Rogue
                 Console.SetCursorPosition((int)player.paikka.X, (int)player.paikka.Y);
                 Console.Write("@");
             }
-            if (player.paikka.X < 0)
-            {
-                player.paikka.X = 0;
-            }
-            else if (player.paikka.X > Console.WindowWidth - 1)
-            {
-                player.paikka.X = Console.WindowWidth - 1;
-            }
-            if (player.paikka.Y < 0)
-            {
-                player.paikka.Y = 0;
-            }
-            else if (player.paikka.Y > Console.WindowHeight - 1)
-            {
-                player.paikka.Y = Console.WindowHeight - 1;
-            }
 
+            if (player.paikka.X < 0) player.paikka.X = 0;
+            else if (player.paikka.X > Console.WindowWidth - 1) player.paikka.X = Console.WindowWidth - 1;
+
+            if (player.paikka.Y < 0) player.paikka.Y = 0;
+            else if (player.paikka.Y > Console.WindowHeight - 1) player.paikka.Y = Console.WindowHeight - 1;
         }
 
+        /// <summary>
+        /// Pääasiallinen pelisilmukka, joka piirtää ja päivittää pelitilaa nykyisen pelitilan perusteella.
+        /// </summary>
         private void GameLoop()
         {
             while (Raylib.WindowShouldClose() == false)
             {
-                // Kuuntele näppäimiä kuuluuko mennä pause menuun
                 if (Raylib.IsKeyPressed(KeyboardKey.KEY_P))
                 {
                     stateStack.Push(GameState.PauseMenu);
@@ -340,14 +318,8 @@ namespace Rogue
                         myPauseMenu.DrawMenu();
                         Raylib.EndDrawing();
                         break;
-
-
-
                 }
-
             }
         }
-
-
     }
 }

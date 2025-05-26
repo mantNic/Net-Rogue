@@ -18,6 +18,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="EnemyTiedot.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="mapfile2.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

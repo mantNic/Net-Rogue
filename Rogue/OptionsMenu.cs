@@ -8,11 +8,14 @@ using ZeroElectric.Vinculum;
 
 namespace Rogue
 {
-
     class OptionsMenu
     {
         public event EventHandler BackButtonPressedEvent;
-       public void DrawMenu()
+
+        /// <summary>
+        /// Piirtää asetukset-valikon ja tarkistaa, onko Takaisin-painiketta painettu.
+        /// </summary>
+        public void DrawMenu()
         {
             int menuWidth = 200;
             int menuX = Raylib.GetScreenWidth() / 2 - menuWidth / 2;
@@ -26,6 +29,5 @@ namespace Rogue
                 BackButtonPressedEvent.Invoke(this, EventArgs.Empty);
             }
         }
-
     }
 }

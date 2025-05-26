@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -15,22 +16,28 @@ namespace Rogue
         private Texture Spritesheet;
         private int imagesPerRow;
         private List<Enemy> enemies;
+        List<Enemy> enemyTypes;
         private List<Item> items;
-       
-        
-        
-       public Enemy GetEnemyAt(int x, int y)
-       {
+
+        /// <summary>
+        /// Palauttaa vihollisen annetussa (x, y) -sijainnissa, tai null jos ei löydy.
+        /// </summary>
+        public Enemy GetEnemyAt(int x, int y)
+        {
             for (int i = 0; i < enemies.Count; i++)
             {
                 if (enemies[i].position.X == x && enemies[i].position.Y == y)
                 {
                     return enemies[i];
-                }                             
+                }
             }
             return null;
-       }
-       public Item GetItemAt(int x, int y)
+        }
+
+        /// <summary>
+        /// Palauttaa esineen annetussa (x, y) -sijainnissa, tai null jos ei löydy.
+        /// </summary>
+        public Item GetItemAt(int x, int y)
         {
             for (int i = 0; i < items.Count; i++)
             {
@@ -55,94 +62,99 @@ namespace Rogue
             items = new List<Item>() { };
         }
 
+        /// <summary>
+        /// Lataa vihollistyypit JSON-tiedostosta enemyTypes-listaan.
+        /// </summary>
+        public void LoadEnemyTypes(string filename)
+        {
+            enemyTypes = new List<Enemy>();
+            if (File.Exists(filename))
+            {
+                string fileContents = File.ReadAllText(filename);
+
+                enemyTypes = JsonConvert.DeserializeObject<List<Enemy>>(fileContents);
+            }
+        }
+
+        /// <summary>
+        /// Lataa viholliset kentälle "enemies"-tasosta.
+        /// </summary>
         public void LoadEnemies()
         {
-            // Hae viholliset sisältävä taso kentästä
+            LoadEnemyTypes("EnemyTiedot.txt");
             MapLayer enemyLayer = GetLayer("enemies");
             int[] enemyTiles = enemyLayer.mapTiles;
             int layerHeight = enemyTiles.Length / mapWidth;
 
-            // Käy taso läpi ja luo viholliset
             for (int y = 0; y < layerHeight; y++)
             {
                 for (int x = 0; x < mapWidth; x++)
                 {
-                    // Laske paikka valmiiksi
                     Vector2 position = new Vector2(x, y);
-
                     int index = x + y * mapWidth;
-
                     int tileId = enemyTiles[index];
 
                     if (tileId == 0)
                     {
-                        // Tässä kohdassa kenttää ei ole vihollista
                         continue;
                     }
                     else
                     {
-                        // Tässä kohdassa kenttää on jokin vihollinen
-
-                        // Tässä pitää vähentää 1,
-                        // koska Tiled editori tallentaa
-                        // palojen numerot alkaen 1:sestä.
                         int spriteId = tileId - 1;
-
-                        // Hae vihollisen nimi
-                        string name = GetEnemyName(spriteId);
-
-                        // Luo uusi vihollinen ja lisää se listaan
-                        enemies.Add(new Enemy(name, position, spriteId));
+                        Enemy newEnemy = GetEnemy(spriteId);
+                        if (newEnemy != null)
+                        {
+                            newEnemy.position = position;
+                            enemies.Add(newEnemy);
+                        }
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// Lataa esineet kentälle "items"-tasosta.
+        /// </summary>
         public void LoadItems()
         {
-
             MapLayer itemLayer = GetLayer("items");
             int[] itemTiles = itemLayer.mapTiles;
             int layerHeight = itemTiles.Length / mapWidth;
-
 
             for (int y = 0; y < layerHeight; y++)
             {
                 for (int x = 0; x < mapWidth; x++)
                 {
-                    // Laske paikka valmiiksi
                     Vector2 position = new Vector2(x, y);
-
                     int index = x + y * mapWidth;
-
                     int tileId = itemTiles[index];
 
                     if (tileId == 0)
                     {
-
                         continue;
                     }
                     else
                     {
-
                         int spriteId = tileId - 1;
-
-                        // Hae vihollisen nimi
                         string name = GetItemName(spriteId);
-
-                        // Luo uusi vihollinen ja lisää se listaan
                         items.Add(new Item(name, position, spriteId));
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// Asettaa spritesheet-kuvan ja rivikohtaisen kuvamäärän piirtämistä varten.
+        /// </summary>
         public void SetSpriteSheet(Texture image, int imagesPerRow)
         {
             this.Spritesheet = image;
             this.imagesPerRow = imagesPerRow;
         }
 
+        /// <summary>
+        /// Palauttaa annetun nimisen MapLayerin tai null jos sitä ei löydy.
+        /// </summary>
         public MapLayer GetLayer(string layerName)
         {
             for (int i = 0; i < layers.Length; i++)
@@ -153,21 +165,26 @@ namespace Rogue
                 }
             }
             Console.WriteLine($"Error: No layer with name: {layerName}");
-            return null; // Wanted layer was not found!
+            return null;
         }
 
+        /// <summary>
+        /// Palauttaa laatta-tyyppikoodin kohdassa (x, y): 2 seinälle, 1 muille.
+        /// </summary>
         public int getTile(int x, int y)
         {
             int index = x + y * mapWidth;
             int tileId = GetLayer("ground").mapTiles[index];
             if (Game.WallTileNumbers.Contains(tileId))
             {
-                // Is a wall
                 return 2;
             }
             return 1;
         }
 
+        /// <summary>
+        /// Piirtää yhden laatan spritesheetistä annettuihin pikselikoordinaatteihin.
+        /// </summary>
         private void Drawtile(int tileIndex, int pixelX, int pixelY)
         {
             int imageX = tileIndex % imagesPerRow;
@@ -181,31 +198,31 @@ namespace Rogue
             Vector2 Position = new Vector2(pixelX, pixelY);
             Raylib.DrawTextureRec(Spritesheet, imageRect, Position, Raylib.WHITE);
         }
+
+        /// <summary>
+        /// Piirtää kartan, mukaan lukien maa, viholliset ja esineet.
+        /// </summary>
         public void draw()
         {
-
-
-            Console.ForegroundColor = ConsoleColor.Gray; // Change to map color
+            Console.ForegroundColor = ConsoleColor.Gray;
             MapLayer groundLayer = GetLayer("ground");
             int[] mapTiles = groundLayer.mapTiles;
-            int mapHeight = mapTiles.Length / mapWidth; // Calculate the height: the amount of rows
-            for (int y = 0; y < mapHeight; y++) // for each row
+            int mapHeight = mapTiles.Length / mapWidth;
+            for (int y = 0; y < mapHeight; y++)
             {
-                for (int x = 0; x < mapWidth; x++) // for each column in the row
+                for (int x = 0; x < mapWidth; x++)
                 {
-                    int index = x + y * mapWidth; // Calculate index of tile at (x, y)
-                    int tileIndex = mapTiles[index]; // Read the tile value at index
+                    int index = x + y * mapWidth;
+                    int tileIndex = mapTiles[index];
 
                     int pixelX = (int)(x * Game.tileSize);
                     int pixelY = (int)(y * Game.tileSize);
-                    // Draw the tile graphics
                     Console.SetCursorPosition(x, y);
-                    if(tileIndex > 0)
+                    if (tileIndex > 0)
                     {
                         tileIndex--;
                     }
                     Drawtile(tileIndex, pixelX, pixelY);
-
                 }
             }
             for (int i = 0; i < enemies.Count; i++)
@@ -231,6 +248,9 @@ namespace Rogue
             }
         }
 
+        /// <summary>
+        /// Palauttaa vihollisen nimen sprite-indeksin perusteella.
+        /// </summary>
         public string GetEnemyName(int spriteIndex)
         {
             switch (spriteIndex)
@@ -241,6 +261,25 @@ namespace Rogue
             }
         }
 
+        /// <summary>
+        /// Palauttaa uuden Enemy-olion spriteId:n perusteella, tai null jos ei löydy.
+        /// </summary>
+        private Enemy GetEnemy(int spriteId)
+        {
+            foreach (Enemy template in enemyTypes)
+            {
+                if (spriteId == template.spriteIndex)
+                {
+                    return new Enemy(template);
+                }
+            }
+            Console.WriteLine($"Error, no enemy found with id: {spriteId}");
+            return null;
+        }
+
+        /// <summary>
+        /// Palauttaa esineen nimen sprite-indeksin perusteella.
+        /// </summary>
         public string GetItemName(int spriteIndex)
         {
             switch (spriteIndex)
@@ -252,4 +291,3 @@ namespace Rogue
         }
     }
 }
-

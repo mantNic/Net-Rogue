@@ -1,0 +1,1 @@
+[{"name":"ok","position":{"X":0.0,"Y":0.0},"spriteIndex":124,"hitPoints":8}]

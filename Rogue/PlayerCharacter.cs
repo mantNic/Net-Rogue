@@ -8,14 +8,11 @@ using ZeroElectric.Vinculum;
 
 namespace Rogue
 {
-
-    
-   public enum Race
+    public enum Race
     {
         Human,
         Elf,
         Orc
-
     }
 
     public enum Class
@@ -35,24 +32,21 @@ namespace Rogue
         public Color pelaajanväri;
         public Texture spritesheet;
 
-
+        /// <summary>
+        /// Piirtää pelaajahahmon nykyiseen sijaintiinsa käyttäen spritesheet-kuvaa.
+        /// </summary>
         public void draw()
         {
             Console.SetCursorPosition((int)paikka.X, (int)paikka.Y);
             int pixelX = (int)(paikka.X * Game.tileSize);
             int pixelY = (int)(paikka.Y * Game.tileSize);
 
-            var imageRect = new Rectangle(0, 8 * Game.tileSize,Game.tileSize, Game.tileSize);
+            var imageRect = new Rectangle(0, 8 * Game.tileSize, Game.tileSize, Game.tileSize);
             var position = new Vector2(pixelX, pixelY);
             Raylib.DrawRectangle(pixelX, pixelY, Game.tileSize, Game.tileSize, Raylib.BLUE);
             Raylib.DrawTextureRec(spritesheet, imageRect, position, Raylib.WHITE);
 
             // we will need setimageindex also
-            
-
-
-
         }
-
     }
 }

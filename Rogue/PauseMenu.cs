@@ -12,6 +12,10 @@ namespace Rogue
     {
         public event EventHandler BackButtonPressedEvent;
         public event EventHandler OptionsPressed;
+
+        /// <summary>
+        /// Piirtää taukovalikon ja laukaisee tapahtumat, kun painikkeita painetaan.
+        /// </summary>
         public void DrawMenu()
         {
             int menuWidth = 200;
@@ -20,10 +24,10 @@ namespace Rogue
             int rowHeight = Raylib.GetScreenHeight() / 10;
             MenuCreator creator = new MenuCreator(menuX, menuY, rowHeight, menuWidth);
 
-            
+
 
             creator.Label("Pause Menu");
-            if(creator.Button("Options"))
+            if (creator.Button("Options"))
             {
                 OptionsPressed.Invoke(this, new EventArgs());
             }
@@ -32,10 +36,5 @@ namespace Rogue
                 BackButtonPressedEvent.Invoke(this, EventArgs.Empty);
             }
         }
-     
-
-
-
     }
 }
-

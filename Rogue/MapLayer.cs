@@ -10,6 +10,10 @@ namespace Rogue
     {
         public string name;
         public int[] mapTiles;
+
+        /// <summary>
+        /// Alustaa uuden karttakerroksen annetulla koolla.
+        /// </summary>
         public MapLayer(int mapSize)
         {
             name = "";
